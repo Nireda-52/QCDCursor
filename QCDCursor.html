@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coût - Délais - Qualité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .slider-group {
+            margin-bottom: 25px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .slider-value {
+            color: #007bff;
+            font-size: 14px;
+        }
+        
+        .slider-value.negative {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .label-negative {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .values-display {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .values-display h3 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Paramètres du Projet</h1>
+        
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Coût</span>
+                <span class="slider-value" id="cost-value">peu cher</span>
+            </div>
+            <input type="range" min="0" max="100" value="67" class="slider" id="cost-slider">
+        </div>
+        
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Délais</span>
+                <span class="slider-value" id="time-value">rapide</span>
+            </div>
+            <input type="range" min="0" max="100" value="67" class="slider" id="time-slider">
+        </div>
+        
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Qualité</span>
+                <span class="slider-value" id="quality-value">qualitatif</span>
+            </div>
+            <input type="range" min="0" max="100" value="66" class="slider" id="quality-slider">
+        </div>
+        
+        <div class="values-display">
+            <h3>Valeurs actuelles :</h3>
+            <p><strong>Coût :</strong> <span id="cost-label">abordable</span></p>
+            <p><strong>Délais :</strong> <span id="time-label">abordable</span></p>
+            <p><strong>Qualité :</strong> <span id="quality-label">correct</span></p>
+            <p><strong>Total :</strong> <span id="total-display">200</span> / 200 max</p>
+            <p style="color: #dc3545; font-style: italic; margin-top: 10px;">
+                💡 Astuce : Impossible d'avoir tout à 100% ! Choisissez vos priorités.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Récupération des éléments
+        const costSlider = document.getElementById('cost-slider');
+        const timeSlider = document.getElementById('time-slider');
+        const qualitySlider = document.getElementById('quality-slider');
+        
+        const costValue = document.getElementById('cost-value');
+        const timeValue = document.getElementById('time-value');
+        const qualityValue = document.getElementById('quality-value');
+        
+        const costLabel = document.getElementById('cost-label');
+        const timeLabel = document.getElementById('time-label');
+        const qualityLabel = document.getElementById('quality-label');
+        
+        // Fonctions pour convertir les valeurs en texte
+        function getCostLabel(value) {
+            if (value >= 0 && value <= 20) return "exorbitant";
+            if (value >= 21 && value <= 40) return "élevé";
+            if (value >= 41 && value <= 60) return "correct";
+            if (value >= 61 && value <= 80) return "abordable";
+            if (value >= 81 && value <= 100) return "gratuit";
+            return value.toString();
+        }
+        
+        function getTimeLabel(value) {
+            if (value >= 0 && value <= 20) return "pharaonique";
+            if (value >= 21 && value <= 40) return "conséquent";
+            if (value >= 41 && value <= 60) return "correct";
+            if (value >= 61 && value <= 80) return "rapide";
+            if (value >= 81 && value <= 100) return "pour hier";
+            return value.toString();
+        }
+        
+        function getQualityLabel(value) {
+            if (value >= 0 && value <= 20) return "bâclé";
+            if (value >= 21 && value <= 40) return "médiocre";
+            if (value >= 41 && value <= 60) return "acceptable";
+            if (value >= 61 && value <= 80) return "correct";
+            if (value >= 81 && value <= 100) return "maximum";
+            return value.toString();
+        }
+        
+        const MAX_TOTAL = 200;
+        
+        // Fonction pour ajuster les autres curseurs
+        function adjustOtherSliders(changedSlider) {
+            const costVal = parseInt(costSlider.value);
+            const timeVal = parseInt(timeSlider.value);
+            const qualityVal = parseInt(qualitySlider.value);
+            
+            const currentTotal = costVal + timeVal + qualityVal;
+            
+            if (currentTotal > MAX_TOTAL) {
+                const excess = currentTotal - MAX_TOTAL;
+                
+                // Identifier les deux autres curseurs
+                let otherSliders = [];
+                if (changedSlider !== costSlider) otherSliders.push(costSlider);
+                if (changedSlider !== timeSlider) otherSliders.push(timeSlider);
+                if (changedSlider !== qualitySlider) otherSliders.push(qualitySlider);
+                
+                // Répartir la réduction sur les deux autres curseurs
+                let remainingReduction = excess;
+                
+                // Première passe : réduire proportionnellement
+                for (let slider of otherSliders) {
+                    const currentValue = parseInt(slider.value);
+                    const reduction = Math.min(currentValue, Math.ceil(remainingReduction / 2));
+                    slider.value = currentValue - reduction;
+                    remainingReduction -= reduction;
+                    
+                    if (remainingReduction <= 0) break;
+                }
+                
+                // Deuxième passe : si il reste encore de la réduction à faire
+                for (let slider of otherSliders) {
+                    if (remainingReduction <= 0) break;
+                    const currentValue = parseInt(slider.value);
+                    const reduction = Math.min(currentValue, remainingReduction);
+                    slider.value = currentValue - reduction;
+                    remainingReduction -= reduction;
+                }
+            }
+        }
+        
+        // Mise à jour des affichages
+        function updateDisplays() {
+            const costVal = parseInt(costSlider.value);
+            const timeVal = parseInt(timeSlider.value);
+            const qualityVal = parseInt(qualitySlider.value);
+            const total = costVal + timeVal + qualityVal;
+            
+            // Mise à jour des labels à côté des curseurs
+            costValue.textContent = getCostLabel(costVal);
+            timeValue.textContent = getTimeLabel(timeVal);
+            qualityValue.textContent = getQualityLabel(qualityVal);
+            
+            // Gestion des couleurs pour les labels des curseurs (rouge si très bas)
+            costValue.className = costVal <= 20 ? 'slider-value negative' : 'slider-value';
+            timeValue.className = timeVal <= 20 ? 'slider-value negative' : 'slider-value';
+            qualityValue.className = qualityVal <= 20 ? 'slider-value negative' : 'slider-value';
+            
+            // Mise à jour des labels dans le résumé avec couleurs
+            costLabel.textContent = getCostLabel(costVal);
+            timeLabel.textContent = getTimeLabel(timeVal);
+            qualityLabel.textContent = getQualityLabel(qualityVal);
+            
+            costLabel.className = costVal <= 20 ? 'label-negative' : '';
+            timeLabel.className = timeVal <= 20 ? 'label-negative' : '';
+            qualityLabel.className = qualityVal <= 20 ? 'label-negative' : '';
+            
+            // Mise à jour du total
+            const totalDisplay = document.getElementById('total-display');
+            if (totalDisplay) {
+                totalDisplay.textContent = total;
+            }
+        }
+        
+        // Écouteurs d'événements avec ajustement automatique
+        costSlider.addEventListener('input', function() {
+            adjustOtherSliders(this);
+            updateDisplays();
+        });
+        
+        timeSlider.addEventListener('input', function() {
+            adjustOtherSliders(this);
+            updateDisplays();
+        });
+        
+        qualitySlider.addEventListener('input', function() {
+            adjustOtherSliders(this);
+            updateDisplays();
+        });
+        
+        // Initialisation
+        updateDisplays();
+    </script>
+</body>
+</html>
