@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coût - Délais - Qualité</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Je veux mon projet :</h1>
+        
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Comment ?</span>
+                <span class="slider-value" id="quality-value">qualitatif</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" class="slider" id="quality-slider">
+        </div>
+
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Quand ?</span>
+                <span class="slider-value" id="time-value">rapide</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" class="slider" id="time-slider">
+        </div>
+
+        <div class="slider-group">
+            <div class="slider-label">
+                <span>Avec les équipes dans quel état ?</span>
+                <span class="slider-value" id="cost-value">peu cher</span>
+            </div>
+            <input type="range" min="0" max="100" value="50" class="slider" id="cost-slider">
+        </div>
+    </div>
+</body>
+
+<script src="./script.js"></script>
+
+</html>
