@@ -1,39 +1,36 @@
 /** TODO
  * Faire un gradient de couleur en fonction de la taille.
- * Mettre en place un système automatique où les lignes s'adaptent au nombre d'éléments que je mets dans les tableaux (Cost, Time et Quality)
-    * Il doit s'adapter à la pondération de chacun des curseurs 
-    * Un curseurs avec 3 éléments est plus dur à reculer qu'un curseur avec 18 éléments.
-        * Remettre tous les sliders de 0 à 100 pour faciliter la réduction
-        * Faire le rapport indice/Length pour obtenir le wording à afficher.
+ * Faire en sorte que l'ajustement fonctionne quelque soit la longueur du slider.
+ * Modifier la longueur du slider dans le HTML pour qu'il corresponde à la longueur du tableau.
  */
 
 //Object de configuration
-const config = {
+let config = {
     Cost: [
-        "En burnout",
-        "Sous pression",
-        "Challengés",
-        "Actif dans les tâches internes",
-        "Equilibre vie pro / vie perso au top !"
+        "😵 En burnout",
+        "😰 Sous pression",
+        "😐 Challengés",
+        "😄 Actif dans les tâches internes",
+        "🤩 Equilibre vie pro / vie perso au top !"
     ],
 
     Time: [
-        "No limit !",
-        "Prenez le temps nécessaire",
+        "📉 Faillite",
+        "Chiffrage large",
         "Chiffrage réaliste",
         "Chiffrage optimiste",
-        "Ce qu'on a vendu au client, rien de plus"
+        "0 Dépassement"
     ],
 
     Quality: [
-        "Cassé",
-        "Baclé",
-        "Fonctionnel mais immaintenable",
-        "Bon à 80 %",
-        "A la perfection !"
+        "10% 🤢 (Cassé)",
+        "30% 🙈 (Fonctionnel mais immaintenable)",
+        "50% 😶‍🌫️ (Fonctionnel)",
+        "80% 😮 (Fonctionnel + Cas limites)",
+        "100% 😎 (Perfection)"
     ],
 
-    MaxTotal: 200
+    MaxTotal: 0
 };
 
 // Récupération des éléments
@@ -52,15 +49,15 @@ const qualityLabel = document.getElementById('quality-label');
 
 // Fonctions pour convertir les valeurs en texte
 function getQualityLabel(value) {
-    let indice = Math.round(value * (config.Quality.length-1) / 100); 
+    let indice = Math.round(value);
     return config.Quality[indice];
 }
 function getTimeLabel(value) {
-    let indice = Math.round(value * (config.Time.length-1) / 100); 
+    let indice = Math.round(value); 
     return config.Time[indice];
 }
 function getCostLabel(value) {
-    let indice = Math.round(value * (config.Cost.length-1) / 100); 
+    let indice = Math.round(value); 
     return config.Cost[indice];
 }
 
@@ -71,8 +68,6 @@ function adjustOtherSliders(changedSlider) {
     const qualityVal = parseInt(qualitySlider.value);
     
     const currentTotal = costVal + timeVal + qualityVal;
-    console.log("-----------");
-    console.log("Total = " + currentTotal);
     
     if (currentTotal > config.MaxTotal) {
         const excess = currentTotal - config.MaxTotal;
@@ -133,10 +128,45 @@ function updateDisplays() {
     timeValue.textContent = getTimeLabel(timeVal);
     qualityValue.textContent = getQualityLabel(qualityVal);
     
-    // Gestion des couleurs pour les labels des curseurs (rouge si très bas)
-    costValue.className = costVal == 1 ? 'slider-value negative' : 'slider-value';
-    timeValue.className = timeVal == 1 ? 'slider-value negative' : 'slider-value';
-    qualityValue.className = qualityVal == 1 ? 'slider-value negative' : 'slider-value';
+    costValue.className = 
+        costVal == 0 ? 'slider-value negative' :
+        costVal == 4 ? 'slider-value positive' :
+        'slider-value';
+
+    timeValue.className = 
+        timeVal == 0 ? 'slider-value negative' :
+        timeVal == 4 ? 'slider-value positive' :
+        'slider-value';
+
+    qualityValue.className = 
+        qualityVal == 0 ? 'slider-value negative' :
+        qualityVal == 4 ? 'slider-value positive' :
+        'slider-value';
+}
+
+function updateSlidersFromConfig() {
+    const sliders = [
+        { id: "cost-slider", key: "Cost" },
+        { id: "time-slider", key: "Time" },
+        { id: "quality-slider", key: "Quality" }
+    ];
+
+    sliders.forEach(slider => {
+        const input = document.getElementById(slider.id);
+        if (!input) return;
+
+        const maxValue = config[slider.key].length - 1; // max = taille du tableau -1
+        input.max = maxValue;
+        input.value = Math.floor(maxValue / 2); // value = max/2
+
+        console.log(`Slider ${slider.id}: max=${input.max}, value=${input.value}`);
+        console.log(input)
+
+        config.MaxTotal += parseInt(input.max); // assure-toi que c'est un nombre
+    });
+
+    config.MaxTotal = (config.MaxTotal * 2) / 3;
+    console.log("maxtotal = " + config.MaxTotal);
 }
 
 // Écouteurs d'événements avec ajustement automatique
@@ -153,5 +183,8 @@ qualitySlider.addEventListener('input', function() {
     updateDisplays();
 });
 
-// Initialisation
-updateDisplays();
+
+window.addEventListener("DOMContentLoaded", () => {
+    updateSlidersFromConfig();
+    updateDisplays();
+});
