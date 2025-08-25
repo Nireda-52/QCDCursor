@@ -6,6 +6,8 @@
 
 //Object de configuration
 let config = {
+    Title: "Je veux mon projet :",
+
     Cost: [
         "😵 En burnout",
         "😰 Sous pression",
@@ -169,6 +171,10 @@ function updateSlidersFromConfig() {
     console.log("maxtotal = " + MaxTotal);
 }
 
+function updateTitleFromConfig() {
+    document.querySelector(".title").textContent = config.Title;
+}
+
 // Écouteurs d'événements avec ajustement automatique
 costSlider.addEventListener('input', function() {
     adjustOtherSliders(this);
@@ -186,5 +192,6 @@ qualitySlider.addEventListener('input', function() {
 
 window.addEventListener("DOMContentLoaded", () => {
     updateSlidersFromConfig();
+    updateTitleFromConfig();
     updateDisplays();
 });
