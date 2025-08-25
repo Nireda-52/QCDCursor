@@ -9,25 +9,31 @@
 
 //Object de configuration
 const config = {
-    Cost1: "En burnout",
-    Cost2: "Sous pression",
-    Cost3: "Challengés",
-    Cost4: "Actif dans les tâches internes",
-    Cost5: "Equilibre vie pro / vie perso au top !",
+    Cost: [
+        "En burnout",
+        "Sous pression",
+        "Challengés",
+        "Actif dans les tâches internes",
+        "Equilibre vie pro / vie perso au top !"
+    ],
 
-    Time1: "No limit !",
-    Time2: "Prenez le temps nécessaire",
-    Time3: "Chiffrage réaliste",
-    Time4: "Chiffrage optimiste",
-    Time5: "Ce qu'on a vendu au client, rien de plus",
+    Time: [
+        "No limit !",
+        "Prenez le temps nécessaire",
+        "Chiffrage réaliste",
+        "Chiffrage optimiste",
+        "Ce qu'on a vendu au client, rien de plus"
+    ],
 
-    Quality1: "Cassé",
-    Quality2: "Baclé",
-    Quality3: "Fonctionnel mais immaintenable",
-    Quality4: "Bon à 80 %",
-    Quality5: "A la perfection !",
+    Quality: [
+        "Cassé",
+        "Baclé",
+        "Fonctionnel mais immaintenable",
+        "Bon à 80 %",
+        "A la perfection !"
+    ],
 
-    MaxTotal: 10
+    MaxTotal: 200
 };
 
 // Récupération des éléments
@@ -46,61 +52,16 @@ const qualityLabel = document.getElementById('quality-label');
 
 // Fonctions pour convertir les valeurs en texte
 function getQualityLabel(value) {
-    switch(value){
-        case 1:
-            return config.Quality1;
-            break;
-        case 2:
-            return config.Quality2;
-            break;
-        case 3:
-            return config.Quality3;
-            break;
-        case 4:
-            return config.Quality4;
-            break;
-        case 5:
-            return config.Quality5;
-            break;
-    }
+    let indice = Math.round(value * (config.Quality.length-1) / 100); 
+    return config.Quality[indice];
 }
 function getTimeLabel(value) {
-    switch(value){
-        case 1:
-            return config.Time1;
-            break;
-        case 2:
-            return config.Time2;
-            break;
-        case 3:
-            return config.Time3;
-            break;
-        case 4:
-            return config.Time4;
-            break;
-        case 5:
-            return config.Time5;
-            break;
-    }
+    let indice = Math.round(value * (config.Time.length-1) / 100); 
+    return config.Time[indice];
 }
 function getCostLabel(value) {
-    switch(value){
-        case 1:
-            return config.Cost1;
-            break;
-        case 2:
-            return config.Cost2;
-            break;
-        case 3:
-            return config.Cost3;
-            break;
-        case 4:
-            return config.Cost4;
-            break;
-        case 5:
-            return config.Cost5;
-            break;
-    }
+    let indice = Math.round(value * (config.Cost.length-1) / 100); 
+    return config.Cost[indice];
 }
 
 // Fonction pour ajuster les autres curseurs
@@ -110,6 +71,7 @@ function adjustOtherSliders(changedSlider) {
     const qualityVal = parseInt(qualitySlider.value);
     
     const currentTotal = costVal + timeVal + qualityVal;
+    console.log("-----------");
     console.log("Total = " + currentTotal);
     
     if (currentTotal > config.MaxTotal) {
@@ -124,24 +86,38 @@ function adjustOtherSliders(changedSlider) {
         
         // Répartir la réduction sur les deux autres curseurs
         let remainingReduction = excess;
-        
-        // Première passe : réduire proportionnellement
-        for (let slider of otherSliders) {
-            const currentValue = parseInt(slider.value);
-            const reduction = Math.min(currentValue, Math.ceil(remainingReduction / 2));
-            slider.value = currentValue - reduction;
-            remainingReduction -= reduction;
-            
-            if (remainingReduction <= 0) break;
-        }
-        
-        // Deuxième passe : si il reste encore de la réduction à faire
-        for (let slider of otherSliders) {
-            if (remainingReduction <= 0) break;
-            const currentValue = parseInt(slider.value);
-            const reduction = Math.min(currentValue, remainingReduction);
-            slider.value = currentValue - reduction;
-            remainingReduction -= reduction;
+        console.log("Début de la réduction");
+
+        // Cas particulier : réduction de 1 → choisir un slider au hasard
+        if (remainingReduction == 1) {
+            const randomSlider = otherSliders[Math.floor(Math.random() * otherSliders.length)];
+            randomSlider.value = Math.max(0, parseInt(randomSlider.value) - 1);
+            console.log("Réduction aléatoire sur :", randomSlider.id);
+        }else {
+            // Première passe : réduire proportionnellement
+            for (let slider of otherSliders) {
+                console.log("--")
+                console.log(slider.id)
+                const currentValue = parseInt(slider.value);
+                const reduction = Math.min(currentValue, Math.ceil(excess / otherSliders.length));
+                console.log("Réduction restante = "+remainingReduction);
+                console.log("currentvalue = "+currentValue)
+                console.log(Math.ceil(remainingReduction / 2))
+                console.log("reduction = "+reduction);
+                slider.value = currentValue - reduction;
+                remainingReduction -= reduction;
+                
+                if (remainingReduction <= 0) break;
+            }
+
+            // Deuxième passe : si il reste encore de la réduction à faire
+            for (let slider of otherSliders) {
+                if (remainingReduction <= 0) break;
+                const currentValue = parseInt(slider.value);
+                const reduction = Math.min(currentValue, remainingReduction);
+                slider.value = currentValue - reduction;
+                remainingReduction -= reduction;
+            }
         }
     }
 }
@@ -149,7 +125,6 @@ function adjustOtherSliders(changedSlider) {
 // Mise à jour des affichages
 function updateDisplays() {
     const costVal = parseInt(costSlider.value);
-    console.log(costVal)
     const timeVal = parseInt(timeSlider.value);
     const qualityVal = parseInt(qualitySlider.value);
     
