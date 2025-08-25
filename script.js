@@ -28,10 +28,10 @@ let config = {
         "50% 😶‍🌫️ (Fonctionnel)",
         "80% 😮 (Fonctionnel + Cas limites)",
         "100% 😎 (Perfection)"
-    ],
-
-    MaxTotal: 0
+    ]
 };
+
+let MaxTotal = 0;
 
 // Récupération des éléments
 const costSlider = document.getElementById('cost-slider');
@@ -69,8 +69,8 @@ function adjustOtherSliders(changedSlider) {
     
     const currentTotal = costVal + timeVal + qualityVal;
     
-    if (currentTotal > config.MaxTotal) {
-        const excess = currentTotal - config.MaxTotal;
+    if (currentTotal > MaxTotal) {
+        const excess = currentTotal - MaxTotal;
         console.log("Excès = "+excess);
         
         // Identifier les deux autres curseurs
@@ -162,11 +162,11 @@ function updateSlidersFromConfig() {
         console.log(`Slider ${slider.id}: max=${input.max}, value=${input.value}`);
         console.log(input)
 
-        config.MaxTotal += parseInt(input.max); // assure-toi que c'est un nombre
+        MaxTotal += parseInt(input.max); // assure-toi que c'est un nombre
     });
 
-    config.MaxTotal = (config.MaxTotal * 2) / 3;
-    console.log("maxtotal = " + config.MaxTotal);
+    MaxTotal = (MaxTotal * 2) / 3;
+    console.log("maxtotal = " + MaxTotal);
 }
 
 // Écouteurs d'événements avec ajustement automatique
